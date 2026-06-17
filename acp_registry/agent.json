@@ -1,16 +1,16 @@
 {
-  "id": "hermes-agent",
-  "name": "Hermes Agent",
+  "id": "nozich-agent",
+  "name": "Nozich Agent",
   "version": "0.16.0",
   "description": "Self-improving open-source AI agent by Nous Research with ACP editor integration, persistent memory, skills, and rich tool support.",
-  "repository": "https://github.com/NousResearch/hermes-agent",
-  "website": "https://hermes-agent.nousresearch.com/docs/user-guide/features/acp",
+  "repository": "https://github.com/anilcan-kara/nozich-agent",
+  "website": "https://nozich-agent.anilcan-kara.com/docs/user-guide/features/acp",
   "authors": ["Nous Research"],
   "license": "MIT",
   "distribution": {
     "uvx": {
-      "package": "hermes-agent[acp]==0.16.0",
-      "args": ["hermes-acp"]
+      "package": "nozich-agent[acp]==0.16.0",
+      "args": ["nozich-acp"]
     }
   }
 }

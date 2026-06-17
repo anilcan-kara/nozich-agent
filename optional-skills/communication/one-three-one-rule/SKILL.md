@@ -14,7 +14,7 @@ author: Willard Moore
 license: MIT
 category: communication
 metadata:
-  hermes:
+  nozich:
     tags: [communication, decision-making, proposals, trade-offs]
 ---
 

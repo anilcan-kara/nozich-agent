@@ -433,7 +433,7 @@ class TelegramAdapter(BasePlatformAdapter):
         self._rich_draft_disabled: bool = False
         # Buffer rapid/album photo updates so Telegram image bursts are handled
         # as a single MessageEvent instead of self-interrupting multiple turns.
-        self._media_batch_delay_seconds = float(os.getenv("HERMES_TELEGRAM_MEDIA_BATCH_DELAY_SECONDS", "0.8"))
+        self._media_batch_delay_seconds = float(os.getenv("NOZICH_TELEGRAM_MEDIA_BATCH_DELAY_SECONDS", "0.8"))
         self._pending_photo_batches: Dict[str, MessageEvent] = {}
         self._pending_photo_batch_tasks: Dict[str, asyncio.Task] = {}
         self._media_group_events: Dict[str, MessageEvent] = {}
@@ -446,13 +446,13 @@ class TelegramAdapter(BasePlatformAdapter):
         # in ~180ms.  All bounds are conservative for Telegram's
         # ~1 edit/s flood envelope.
         self._text_batch_delay_seconds = self._env_float_clamped(
-            "HERMES_TELEGRAM_TEXT_BATCH_DELAY_SECONDS",
+            "NOZICH_TELEGRAM_TEXT_BATCH_DELAY_SECONDS",
             0.3,
             min_value=0.08,
             max_value=2.0,
         )
         self._text_batch_split_delay_seconds = self._env_float_clamped(
-            "HERMES_TELEGRAM_TEXT_BATCH_SPLIT_DELAY_SECONDS",
+            "NOZICH_TELEGRAM_TEXT_BATCH_SPLIT_DELAY_SECONDS",
             1.0,
             min_value=self._text_batch_delay_seconds,
             max_value=4.0,
@@ -664,7 +664,7 @@ class TelegramAdapter(BasePlatformAdapter):
 
         Supergroup/forum topics use ``message_thread_id``. True Bot API Direct
         Messages topics can opt in with explicit ``direct_messages_topic_id``
-        metadata. Hermes-created private-chat topic lanes are marked with
+        metadata. Nozich-created private-chat topic lanes are marked with
         ``telegram_dm_topic_reply_fallback``. Live replies send the private
         topic thread id together with a reply anchor; synthetic/resumed sends
         without an anchor use ``direct_messages_topic_id`` when metadata has it.
@@ -928,7 +928,7 @@ class TelegramAdapter(BasePlatformAdapter):
     # the RAW agent markdown so richer constructs (tables, task lists,
     # collapsible details, math, ...) render natively. The legacy MarkdownV2
     # send() path stays as the fallback for unsupported/oversized content and
-    # older PTB/clients. Streaming edits stay on Hermes' existing MarkdownV2
+    # older PTB/clients. Streaming edits stay on Nozich' existing MarkdownV2
     # edit path for now; finalization can re-send as rich and delete the stale
     # preview until rich_message edit support is wired directly.
     # ------------------------------------------------------------------
@@ -971,7 +971,7 @@ class TelegramAdapter(BasePlatformAdapter):
         Telegram Desktop 6.9.1 can crash while rendering Bot API 10.1 rich
         messages containing math inside a collapsible details block
         (telegramdesktop/tdesktop#30808). The Bot API accepts the payload, so
-        Hermes must skip rich delivery up front and use the legacy MarkdownV2
+        Nozich must skip rich delivery up front and use the legacy MarkdownV2
         path until affected Desktop clients age out.
         """
         if not content:
@@ -1544,7 +1544,7 @@ class TelegramAdapter(BasePlatformAdapter):
         if self.has_fatal_error and self.fatal_error_code == "telegram_polling_conflict":
             return
         # Transient 409 Conflict errors arise when the previous gateway process
-        # has been killed (e.g. during `hermes update` or `--replace` handoffs)
+        # has been killed (e.g. during `nozich update` or `--replace` handoffs)
         # but its long-poll connection hasn't yet expired on Telegram's servers.
         # Telegram holds open getUpdates sessions for up to ~30s after the
         # client disconnects, so a new gateway starting immediately will receive
@@ -1633,8 +1633,8 @@ class TelegramAdapter(BasePlatformAdapter):
             "Telegram polling could not recover after %d retries (%ds total wait). "
             "The previous gateway session is still held open on Telegram's servers, "
             "or another process is using the same bot token. "
-            "To recover: ensure no other Hermes or OpenClaw instance is running "
-            "with this token, then restart the gateway with 'hermes gateway restart'."
+            "To recover: ensure no other Nozich or OpenClaw instance is running "
+            "with this token, then restart the gateway with 'nozich gateway restart'."
             % (MAX_CONFLICT_RETRIES, sum(10 + i * 10 for i in range(1, MAX_CONFLICT_RETRIES + 1)))
         )
         logger.error(
@@ -1806,8 +1806,8 @@ class TelegramAdapter(BasePlatformAdapter):
     ) -> None:
         """Save a newly created thread_id back into config.yaml so it persists across restarts."""
         try:
-            from hermes_constants import get_hermes_home
-            config_path = get_hermes_home() / "config.yaml"
+            from nozich_constants import get_nozich_home
+            config_path = get_nozich_home() / "config.yaml"
             if not config_path.exists():
                 logger.warning("[%s] Config file not found at %s, cannot persist thread_id", self.name, config_path)
                 return
@@ -2009,7 +2009,7 @@ class TelegramAdapter(BasePlatformAdapter):
             # server's filesystem rather than a relative HTTP path. PTB needs
             # local_mode=True so download_*() reads from disk instead of issuing
             # an HTTP GET that would 404. Requires that the same path is
-            # readable by the Hermes process (shared mount, same machine, etc.).
+            # readable by the Nozich process (shared mount, same machine, etc.).
             if self.config.extra.get("local_mode"):
                 builder = builder.local_mode(True)
                 logger.info("[%s] Using Telegram local_mode (read files from disk)", self.name)
@@ -2030,14 +2030,14 @@ class TelegramAdapter(BasePlatformAdapter):
                     return default
 
             request_kwargs = {
-                "connection_pool_size": _env_int("HERMES_TELEGRAM_HTTP_POOL_SIZE", 512),
-                "pool_timeout": _env_float("HERMES_TELEGRAM_HTTP_POOL_TIMEOUT", 8.0),
-                "connect_timeout": _env_float("HERMES_TELEGRAM_HTTP_CONNECT_TIMEOUT", 10.0),
-                "read_timeout": _env_float("HERMES_TELEGRAM_HTTP_READ_TIMEOUT", 20.0),
-                "write_timeout": _env_float("HERMES_TELEGRAM_HTTP_WRITE_TIMEOUT", 20.0),
+                "connection_pool_size": _env_int("NOZICH_TELEGRAM_HTTP_POOL_SIZE", 512),
+                "pool_timeout": _env_float("NOZICH_TELEGRAM_HTTP_POOL_TIMEOUT", 8.0),
+                "connect_timeout": _env_float("NOZICH_TELEGRAM_HTTP_CONNECT_TIMEOUT", 10.0),
+                "read_timeout": _env_float("NOZICH_TELEGRAM_HTTP_READ_TIMEOUT", 20.0),
+                "write_timeout": _env_float("NOZICH_TELEGRAM_HTTP_WRITE_TIMEOUT", 20.0),
             }
 
-            disable_fallback = (os.getenv("HERMES_TELEGRAM_DISABLE_FALLBACK_IPS", "").strip().lower() in {"1", "true", "yes", "on"})
+            disable_fallback = (os.getenv("NOZICH_TELEGRAM_DISABLE_FALLBACK_IPS", "").strip().lower() in {"1", "true", "yes", "on"})
             fallback_ips = self._fallback_ips()
             if not fallback_ips:
                 fallback_ips = await discover_fallback_ips()
@@ -2144,7 +2144,7 @@ class TelegramAdapter(BasePlatformAdapter):
                         "TELEGRAM_WEBHOOK_URL is set. Without it, the "
                         "webhook endpoint accepts forged updates from "
                         "anyone who can reach it — see "
-                        "https://github.com/NousResearch/hermes-agent/"
+                        "https://github.com/anilcan-kara/nozich-agent/"
                         "security/advisories/GHSA-3vpc-7q5r-276h.\n\n"
                         "Generate a secret and set it in your .env:\n"
                         "  export TELEGRAM_WEBHOOK_SECRET=\"$(openssl rand -hex 32)\"\n\n"
@@ -2208,7 +2208,7 @@ class TelegramAdapter(BasePlatformAdapter):
                     BotCommandScopeAllGroupChats,
                     BotCommandScopeDefault,
                 )
-                from hermes_cli.commands import telegram_menu_commands
+                from nozich_cli.commands import telegram_menu_commands
                 # Telegram allows up to 100 commands but has an undocumented
                 # payload size limit (~4KB total).  Limit to 30 core commands
                 # to stay well under the threshold while covering all categories.
@@ -3171,7 +3171,7 @@ class TelegramAdapter(BasePlatformAdapter):
     ) -> SendResult:
         """Send an inline-keyboard update prompt (Yes / No buttons).
 
-        Used by the gateway ``/update`` watcher when ``hermes update --gateway``
+        Used by the gateway ``/update`` watcher when ``nozich update --gateway``
         needs user input (stash restore, config migration).
         """
         if not self._bot:
@@ -3428,7 +3428,7 @@ class TelegramAdapter(BasePlatformAdapter):
             return SendResult(success=False, error="Not connected")
 
         try:
-            from hermes_cli.providers import get_label
+            from nozich_cli.providers import get_label
         except ImportError:
             def get_label(slug):
                 return slug
@@ -3489,11 +3489,11 @@ class TelegramAdapter(BasePlatformAdapter):
         a single ``mpg:<gid>`` button; tapping it drills into a member
         sub-keyboard. Single providers (and groups with only one authenticated
         member) render as direct ``mp:<slug>`` buttons. Grouping mirrors the
-        CLI ``hermes model`` picker via the shared ``group_providers`` fold,
+        CLI ``nozich model`` picker via the shared ``group_providers`` fold,
         so all surfaces stay consistent.
         """
         try:
-            from hermes_cli.models import group_providers
+            from nozich_cli.models import group_providers
         except Exception:
             group_providers = None
 
@@ -3583,7 +3583,7 @@ class TelegramAdapter(BasePlatformAdapter):
             return
 
         try:
-            from hermes_cli.providers import get_label
+            from nozich_cli.providers import get_label
         except ImportError:
             def get_label(slug):
                 return slug
@@ -3732,7 +3732,7 @@ class TelegramAdapter(BasePlatformAdapter):
                 return
 
             try:
-                from hermes_cli.model_cost_guard import expensive_model_warning
+                from nozich_cli.model_cost_guard import expensive_model_warning
 
                 # Pricing lookup can hit models.dev / a /models endpoint on a
                 # cache miss — keep it off the event loop.
@@ -3797,7 +3797,7 @@ class TelegramAdapter(BasePlatformAdapter):
             # --- Provider group selected: show member providers ---
             group_id = data[4:]
             try:
-                from hermes_cli.models import PROVIDER_GROUPS
+                from nozich_cli.models import PROVIDER_GROUPS
                 _label, _desc, member_slugs = PROVIDER_GROUPS.get(group_id, ("", "", []))
             except Exception:
                 _label, member_slugs = "", []
@@ -4210,8 +4210,8 @@ class TelegramAdapter(BasePlatformAdapter):
             pass  # non-fatal if edit fails
         # Write the response file
         try:
-            from hermes_constants import get_hermes_home
-            home = get_hermes_home()
+            from nozich_constants import get_nozich_home
+            home = get_nozich_home()
             response_path = home / ".update_response"
             tmp = response_path.with_suffix(".tmp")
             tmp.write_text(answer)
@@ -4222,7 +4222,7 @@ class TelegramAdapter(BasePlatformAdapter):
             logger.error("Failed to write update response from callback: %s", exc)
 
     # Maps `gt:<verb>` -> (script-name, extra-args, success-label, is_state).
-    # Scripts live in ~/.hermes/scripts/gmail-triage/. `arg` from the callback
+    # Scripts live in ~/.nozich/scripts/gmail-triage/. `arg` from the callback
     # data is always passed as the first positional arg.
     # is_state=True means the verb is a sticky sender-rule change (mute, trust,
     # vip) that should leave the keyboard tappable for follow-on actions.
@@ -4275,7 +4275,7 @@ class TelegramAdapter(BasePlatformAdapter):
             return
         script_name, extra_args, success_label, is_state_verb = entry
 
-        script_path = _Path.home() / ".hermes" / "scripts" / "gmail-triage" / script_name
+        script_path = _Path.home() / ".nozich" / "scripts" / "gmail-triage" / script_name
         if not script_path.exists():
             await query.answer(text=f"❌ {script_name} missing")
             logger.error("[%s] gmail-triage script missing: %s", self.name, script_path)
@@ -5425,7 +5425,7 @@ class TelegramAdapter(BasePlatformAdapter):
         # Telegram parses mentions server-side and emits MessageEntity objects
         # (type=mention for @username, type=text_mention for @FirstName targeting
         # a user without a public username). Those entities are authoritative:
-        # raw substring matches like "foo@hermes_bot.example" are not mentions
+        # raw substring matches like "foo@nozich_bot.example" are not mentions
         # (bug #12545). Entities also correctly handle @handles inside URLs, code
         # blocks, and quoted text, where a regex scan would over-match.
         for source_text, entities in _iter_sources():
@@ -5469,7 +5469,7 @@ class TelegramAdapter(BasePlatformAdapter):
     def _explicit_bot_mentions_exclude_self(self, message: Message) -> bool:
         """Return True when explicit bot handles target other bots, not this one.
 
-        Telegram groups can contain several Hermes bot profiles. A message like
+        Telegram groups can contain several Nozich bot profiles. A message like
         ``@bot3 hi @bot4`` must not wake ``@bot1`` through reply/wake-word
         fallbacks. Treat explicit bot-handle mentions as an exclusive routing
         hint: if at least one @...bot username is present and none matches this
@@ -5878,7 +5878,7 @@ class TelegramAdapter(BasePlatformAdapter):
                 if chat_id in self._forum_command_registered:
                     return
                 from telegram import BotCommand, BotCommandScopeChat
-                from hermes_cli.commands import telegram_menu_commands
+                from nozich_cli.commands import telegram_menu_commands
                 menu_commands, _ = telegram_menu_commands(max_commands=MAX_COMMANDS_PER_SCOPE)
                 bot_commands = [BotCommand(name, desc) for name, desc in menu_commands]
                 await self._bot.set_my_commands(bot_commands, scope=BotCommandScopeChat(chat_id=chat_id))
@@ -6489,8 +6489,8 @@ class TelegramAdapter(BasePlatformAdapter):
         recognized without a gateway restart.
         """
         try:
-            from hermes_constants import get_hermes_home
-            config_path = get_hermes_home() / "config.yaml"
+            from nozich_constants import get_nozich_home
+            config_path = get_nozich_home() / "config.yaml"
             if not config_path.exists():
                 return
 

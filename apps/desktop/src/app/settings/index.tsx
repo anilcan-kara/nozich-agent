@@ -2,7 +2,7 @@ import { IconDownload, IconRefresh, IconUpload } from '@tabler/icons-react'
 import { useRef } from 'react'
 
 import { Tip } from '@/components/ui/tooltip'
-import { getHermesConfigDefaults, getHermesConfigRecord, saveHermesConfig } from '@/hermes'
+import { getNozichConfigDefaults, getNozichConfigRecord, saveNozichConfig } from '@/nozich'
 import { useI18n } from '@/i18n'
 import { triggerHaptic } from '@/lib/haptics'
 import { Archive, Bell, Globe, Info, KeyRound, Settings2, Sparkles, Wrench, Zap } from '@/lib/icons'
@@ -58,12 +58,12 @@ export function SettingsView({ gateway, onClose, onConfigSaved, onMainModelChang
 
   const exportConfig = async () => {
     try {
-      const cfg = await getHermesConfigRecord()
+      const cfg = await getNozichConfigRecord()
       const blob = new Blob([JSON.stringify(cfg, null, 2)], { type: 'application/json' })
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = 'hermes-config.json'
+      a.download = 'nozich-config.json'
       a.click()
       URL.revokeObjectURL(url)
       triggerHaptic('success')
@@ -78,7 +78,7 @@ export function SettingsView({ gateway, onClose, onConfigSaved, onMainModelChang
     }
 
     try {
-      await saveHermesConfig(await getHermesConfigDefaults())
+      await saveNozichConfig(await getNozichConfigDefaults())
       triggerHaptic('success')
       onConfigSaved?.()
     } catch (err) {

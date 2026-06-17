@@ -43,7 +43,7 @@ in
   # trailing newline so both sides always match.
   #
   # Usage:
-  #   npm = hermesNpmLib.mkNpmPassthru { folder = "ui-tui"; attr = "tui"; pname = "hermes-tui"; };
+  #   npm = nozichNpmLib.mkNpmPassthru { folder = "ui-tui"; attr = "tui"; pname = "nozich-tui"; };
   #   pkgs.buildNpmPackage (npm // {
   #     sourceRoot = "ui-tui";
   #     buildPhase = '' ... '';

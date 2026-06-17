@@ -1,0 +1,4 @@
+[console_scripts]
+nozich = nozich_cli.main:main
+nozich-acp = acp_adapter.entry:main
+nozich-agent = run_agent:main

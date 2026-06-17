@@ -1,34 +1,34 @@
 const { contextBridge, ipcRenderer, webUtils } = require('electron')
 
-contextBridge.exposeInMainWorld('hermesDesktop', {
-  getConnection: profile => ipcRenderer.invoke('hermes:connection', profile),
-  revalidateConnection: () => ipcRenderer.invoke('hermes:connection:revalidate'),
-  touchBackend: profile => ipcRenderer.invoke('hermes:backend:touch', profile),
-  getGatewayWsUrl: profile => ipcRenderer.invoke('hermes:gateway:ws-url', profile),
-  openSessionWindow: (sessionId, opts) => ipcRenderer.invoke('hermes:window:openSession', sessionId, opts),
-  openNewSessionWindow: () => ipcRenderer.invoke('hermes:window:openNewSession'),
-  getBootProgress: () => ipcRenderer.invoke('hermes:boot-progress:get'),
-  getConnectionConfig: profile => ipcRenderer.invoke('hermes:connection-config:get', profile),
-  saveConnectionConfig: payload => ipcRenderer.invoke('hermes:connection-config:save', payload),
-  applyConnectionConfig: payload => ipcRenderer.invoke('hermes:connection-config:apply', payload),
-  testConnectionConfig: payload => ipcRenderer.invoke('hermes:connection-config:test', payload),
-  probeConnectionConfig: remoteUrl => ipcRenderer.invoke('hermes:connection-config:probe', remoteUrl),
-  oauthLoginConnectionConfig: remoteUrl => ipcRenderer.invoke('hermes:connection-config:oauth-login', remoteUrl),
-  oauthLogoutConnectionConfig: remoteUrl => ipcRenderer.invoke('hermes:connection-config:oauth-logout', remoteUrl),
+contextBridge.exposeInMainWorld('nozichDesktop', {
+  getConnection: profile => ipcRenderer.invoke('nozich:connection', profile),
+  revalidateConnection: () => ipcRenderer.invoke('nozich:connection:revalidate'),
+  touchBackend: profile => ipcRenderer.invoke('nozich:backend:touch', profile),
+  getGatewayWsUrl: profile => ipcRenderer.invoke('nozich:gateway:ws-url', profile),
+  openSessionWindow: (sessionId, opts) => ipcRenderer.invoke('nozich:window:openSession', sessionId, opts),
+  openNewSessionWindow: () => ipcRenderer.invoke('nozich:window:openNewSession'),
+  getBootProgress: () => ipcRenderer.invoke('nozich:boot-progress:get'),
+  getConnectionConfig: profile => ipcRenderer.invoke('nozich:connection-config:get', profile),
+  saveConnectionConfig: payload => ipcRenderer.invoke('nozich:connection-config:save', payload),
+  applyConnectionConfig: payload => ipcRenderer.invoke('nozich:connection-config:apply', payload),
+  testConnectionConfig: payload => ipcRenderer.invoke('nozich:connection-config:test', payload),
+  probeConnectionConfig: remoteUrl => ipcRenderer.invoke('nozich:connection-config:probe', remoteUrl),
+  oauthLoginConnectionConfig: remoteUrl => ipcRenderer.invoke('nozich:connection-config:oauth-login', remoteUrl),
+  oauthLogoutConnectionConfig: remoteUrl => ipcRenderer.invoke('nozich:connection-config:oauth-logout', remoteUrl),
   profile: {
-    get: () => ipcRenderer.invoke('hermes:profile:get'),
-    set: name => ipcRenderer.invoke('hermes:profile:set', name)
+    get: () => ipcRenderer.invoke('nozich:profile:get'),
+    set: name => ipcRenderer.invoke('nozich:profile:set', name)
   },
-  api: request => ipcRenderer.invoke('hermes:api', request),
-  notify: payload => ipcRenderer.invoke('hermes:notify', payload),
-  requestMicrophoneAccess: () => ipcRenderer.invoke('hermes:requestMicrophoneAccess'),
-  readFileDataUrl: filePath => ipcRenderer.invoke('hermes:readFileDataUrl', filePath),
-  readFileText: filePath => ipcRenderer.invoke('hermes:readFileText', filePath),
-  selectPaths: options => ipcRenderer.invoke('hermes:selectPaths', options),
-  writeClipboard: text => ipcRenderer.invoke('hermes:writeClipboard', text),
-  saveImageFromUrl: url => ipcRenderer.invoke('hermes:saveImageFromUrl', url),
-  saveImageBuffer: (data, ext) => ipcRenderer.invoke('hermes:saveImageBuffer', { data, ext }),
-  saveClipboardImage: () => ipcRenderer.invoke('hermes:saveClipboardImage'),
+  api: request => ipcRenderer.invoke('nozich:api', request),
+  notify: payload => ipcRenderer.invoke('nozich:notify', payload),
+  requestMicrophoneAccess: () => ipcRenderer.invoke('nozich:requestMicrophoneAccess'),
+  readFileDataUrl: filePath => ipcRenderer.invoke('nozich:readFileDataUrl', filePath),
+  readFileText: filePath => ipcRenderer.invoke('nozich:readFileText', filePath),
+  selectPaths: options => ipcRenderer.invoke('nozich:selectPaths', options),
+  writeClipboard: text => ipcRenderer.invoke('nozich:writeClipboard', text),
+  saveImageFromUrl: url => ipcRenderer.invoke('nozich:saveImageFromUrl', url),
+  saveImageBuffer: (data, ext) => ipcRenderer.invoke('nozich:saveImageBuffer', { data, ext }),
+  saveClipboardImage: () => ipcRenderer.invoke('nozich:saveClipboardImage'),
   getPathForFile: file => {
     try {
       return webUtils.getPathForFile(file) || ''
@@ -36,39 +36,39 @@ contextBridge.exposeInMainWorld('hermesDesktop', {
       return ''
     }
   },
-  normalizePreviewTarget: (target, baseDir) => ipcRenderer.invoke('hermes:normalizePreviewTarget', target, baseDir),
-  watchPreviewFile: url => ipcRenderer.invoke('hermes:watchPreviewFile', url),
-  stopPreviewFileWatch: id => ipcRenderer.invoke('hermes:stopPreviewFileWatch', id),
-  setTitleBarTheme: payload => ipcRenderer.send('hermes:titlebar-theme', payload),
-  setNativeTheme: mode => ipcRenderer.send('hermes:native-theme', mode),
-  setTranslucency: payload => ipcRenderer.send('hermes:translucency', payload),
-  setPreviewShortcutActive: active => ipcRenderer.send('hermes:previewShortcutActive', Boolean(active)),
-  openExternal: url => ipcRenderer.invoke('hermes:openExternal', url),
-  fetchLinkTitle: url => ipcRenderer.invoke('hermes:fetchLinkTitle', url),
-  sanitizeWorkspaceCwd: cwd => ipcRenderer.invoke('hermes:workspace:sanitize', cwd),
+  normalizePreviewTarget: (target, baseDir) => ipcRenderer.invoke('nozich:normalizePreviewTarget', target, baseDir),
+  watchPreviewFile: url => ipcRenderer.invoke('nozich:watchPreviewFile', url),
+  stopPreviewFileWatch: id => ipcRenderer.invoke('nozich:stopPreviewFileWatch', id),
+  setTitleBarTheme: payload => ipcRenderer.send('nozich:titlebar-theme', payload),
+  setNativeTheme: mode => ipcRenderer.send('nozich:native-theme', mode),
+  setTranslucency: payload => ipcRenderer.send('nozich:translucency', payload),
+  setPreviewShortcutActive: active => ipcRenderer.send('nozich:previewShortcutActive', Boolean(active)),
+  openExternal: url => ipcRenderer.invoke('nozich:openExternal', url),
+  fetchLinkTitle: url => ipcRenderer.invoke('nozich:fetchLinkTitle', url),
+  sanitizeWorkspaceCwd: cwd => ipcRenderer.invoke('nozich:workspace:sanitize', cwd),
   settings: {
-    getDefaultProjectDir: () => ipcRenderer.invoke('hermes:setting:defaultProjectDir:get'),
-    setDefaultProjectDir: dir => ipcRenderer.invoke('hermes:setting:defaultProjectDir:set', dir),
-    pickDefaultProjectDir: () => ipcRenderer.invoke('hermes:setting:defaultProjectDir:pick')
+    getDefaultProjectDir: () => ipcRenderer.invoke('nozich:setting:defaultProjectDir:get'),
+    setDefaultProjectDir: dir => ipcRenderer.invoke('nozich:setting:defaultProjectDir:set', dir),
+    pickDefaultProjectDir: () => ipcRenderer.invoke('nozich:setting:defaultProjectDir:pick')
   },
-  revealLogs: () => ipcRenderer.invoke('hermes:logs:reveal'),
-  getRecentLogs: () => ipcRenderer.invoke('hermes:logs:recent'),
-  readDir: dirPath => ipcRenderer.invoke('hermes:fs:readDir', dirPath),
-  gitRoot: startPath => ipcRenderer.invoke('hermes:fs:gitRoot', startPath),
-  worktrees: cwds => ipcRenderer.invoke('hermes:fs:worktrees', cwds),
+  revealLogs: () => ipcRenderer.invoke('nozich:logs:reveal'),
+  getRecentLogs: () => ipcRenderer.invoke('nozich:logs:recent'),
+  readDir: dirPath => ipcRenderer.invoke('nozich:fs:readDir', dirPath),
+  gitRoot: startPath => ipcRenderer.invoke('nozich:fs:gitRoot', startPath),
+  worktrees: cwds => ipcRenderer.invoke('nozich:fs:worktrees', cwds),
   terminal: {
-    dispose: id => ipcRenderer.invoke('hermes:terminal:dispose', id),
-    resize: (id, size) => ipcRenderer.invoke('hermes:terminal:resize', id, size),
-    start: options => ipcRenderer.invoke('hermes:terminal:start', options),
-    write: (id, data) => ipcRenderer.invoke('hermes:terminal:write', id, data),
+    dispose: id => ipcRenderer.invoke('nozich:terminal:dispose', id),
+    resize: (id, size) => ipcRenderer.invoke('nozich:terminal:resize', id, size),
+    start: options => ipcRenderer.invoke('nozich:terminal:start', options),
+    write: (id, data) => ipcRenderer.invoke('nozich:terminal:write', id, data),
     onData: (id, callback) => {
-      const channel = `hermes:terminal:${id}:data`
+      const channel = `nozich:terminal:${id}:data`
       const listener = (_event, payload) => callback(payload)
       ipcRenderer.on(channel, listener)
       return () => ipcRenderer.removeListener(channel, listener)
     },
     onExit: (id, callback) => {
-      const channel = `hermes:terminal:${id}:exit`
+      const channel = `nozich:terminal:${id}:exit`
       const listener = (_event, payload) => callback(payload)
       ipcRenderer.on(channel, listener)
       return () => ipcRenderer.removeListener(channel, listener)
@@ -76,87 +76,87 @@ contextBridge.exposeInMainWorld('hermesDesktop', {
   },
   onClosePreviewRequested: callback => {
     const listener = () => callback()
-    ipcRenderer.on('hermes:close-preview-requested', listener)
-    return () => ipcRenderer.removeListener('hermes:close-preview-requested', listener)
+    ipcRenderer.on('nozich:close-preview-requested', listener)
+    return () => ipcRenderer.removeListener('nozich:close-preview-requested', listener)
   },
   onOpenUpdatesRequested: callback => {
     const listener = () => callback()
-    ipcRenderer.on('hermes:open-updates', listener)
-    return () => ipcRenderer.removeListener('hermes:open-updates', listener)
+    ipcRenderer.on('nozich:open-updates', listener)
+    return () => ipcRenderer.removeListener('nozich:open-updates', listener)
   },
   onDeepLink: callback => {
     const listener = (_event, payload) => callback(payload)
-    ipcRenderer.on('hermes:deep-link', listener)
-    return () => ipcRenderer.removeListener('hermes:deep-link', listener)
+    ipcRenderer.on('nozich:deep-link', listener)
+    return () => ipcRenderer.removeListener('nozich:deep-link', listener)
   },
-  signalDeepLinkReady: () => ipcRenderer.invoke('hermes:deep-link-ready'),
+  signalDeepLinkReady: () => ipcRenderer.invoke('nozich:deep-link-ready'),
   onWindowStateChanged: callback => {
     const listener = (_event, payload) => callback(payload)
-    ipcRenderer.on('hermes:window-state-changed', listener)
-    return () => ipcRenderer.removeListener('hermes:window-state-changed', listener)
+    ipcRenderer.on('nozich:window-state-changed', listener)
+    return () => ipcRenderer.removeListener('nozich:window-state-changed', listener)
   },
   onFocusSession: callback => {
     const listener = (_event, sessionId) => callback(sessionId)
-    ipcRenderer.on('hermes:focus-session', listener)
-    return () => ipcRenderer.removeListener('hermes:focus-session', listener)
+    ipcRenderer.on('nozich:focus-session', listener)
+    return () => ipcRenderer.removeListener('nozich:focus-session', listener)
   },
   onNotificationAction: callback => {
     const listener = (_event, payload) => callback(payload)
-    ipcRenderer.on('hermes:notification-action', listener)
-    return () => ipcRenderer.removeListener('hermes:notification-action', listener)
+    ipcRenderer.on('nozich:notification-action', listener)
+    return () => ipcRenderer.removeListener('nozich:notification-action', listener)
   },
   onPreviewFileChanged: callback => {
     const listener = (_event, payload) => callback(payload)
-    ipcRenderer.on('hermes:preview-file-changed', listener)
-    return () => ipcRenderer.removeListener('hermes:preview-file-changed', listener)
+    ipcRenderer.on('nozich:preview-file-changed', listener)
+    return () => ipcRenderer.removeListener('nozich:preview-file-changed', listener)
   },
   onBackendExit: callback => {
     const listener = (_event, payload) => callback(payload)
-    ipcRenderer.on('hermes:backend-exit', listener)
-    return () => ipcRenderer.removeListener('hermes:backend-exit', listener)
+    ipcRenderer.on('nozich:backend-exit', listener)
+    return () => ipcRenderer.removeListener('nozich:backend-exit', listener)
   },
   onPowerResume: callback => {
     const listener = () => callback()
-    ipcRenderer.on('hermes:power-resume', listener)
-    return () => ipcRenderer.removeListener('hermes:power-resume', listener)
+    ipcRenderer.on('nozich:power-resume', listener)
+    return () => ipcRenderer.removeListener('nozich:power-resume', listener)
   },
   onBootProgress: callback => {
     const listener = (_event, payload) => callback(payload)
-    ipcRenderer.on('hermes:boot-progress', listener)
-    return () => ipcRenderer.removeListener('hermes:boot-progress', listener)
+    ipcRenderer.on('nozich:boot-progress', listener)
+    return () => ipcRenderer.removeListener('nozich:boot-progress', listener)
   },
   // First-launch bootstrap progress -- emitted by the install.ps1 stage
   // runner in main.cjs (apps/desktop/electron/bootstrap-runner.cjs).
   // Renderer's install overlay subscribes to live events and queries the
   // current snapshot via getBootstrapState() to recover after a devtools
   // reload mid-bootstrap.
-  getBootstrapState: () => ipcRenderer.invoke('hermes:bootstrap:get'),
-  resetBootstrap: () => ipcRenderer.invoke('hermes:bootstrap:reset'),
-  repairBootstrap: () => ipcRenderer.invoke('hermes:bootstrap:repair'),
-  cancelBootstrap: () => ipcRenderer.invoke('hermes:bootstrap:cancel'),
+  getBootstrapState: () => ipcRenderer.invoke('nozich:bootstrap:get'),
+  resetBootstrap: () => ipcRenderer.invoke('nozich:bootstrap:reset'),
+  repairBootstrap: () => ipcRenderer.invoke('nozich:bootstrap:repair'),
+  cancelBootstrap: () => ipcRenderer.invoke('nozich:bootstrap:cancel'),
   onBootstrapEvent: callback => {
     const listener = (_event, payload) => callback(payload)
-    ipcRenderer.on('hermes:bootstrap:event', listener)
-    return () => ipcRenderer.removeListener('hermes:bootstrap:event', listener)
+    ipcRenderer.on('nozich:bootstrap:event', listener)
+    return () => ipcRenderer.removeListener('nozich:bootstrap:event', listener)
   },
-  getVersion: () => ipcRenderer.invoke('hermes:version'),
+  getVersion: () => ipcRenderer.invoke('nozich:version'),
   uninstall: {
-    summary: () => ipcRenderer.invoke('hermes:uninstall:summary'),
-    run: mode => ipcRenderer.invoke('hermes:uninstall:run', { mode })
+    summary: () => ipcRenderer.invoke('nozich:uninstall:summary'),
+    run: mode => ipcRenderer.invoke('nozich:uninstall:run', { mode })
   },
   updates: {
-    check: () => ipcRenderer.invoke('hermes:updates:check'),
-    apply: opts => ipcRenderer.invoke('hermes:updates:apply', opts),
-    getBranch: () => ipcRenderer.invoke('hermes:updates:branch:get'),
-    setBranch: name => ipcRenderer.invoke('hermes:updates:branch:set', name),
+    check: () => ipcRenderer.invoke('nozich:updates:check'),
+    apply: opts => ipcRenderer.invoke('nozich:updates:apply', opts),
+    getBranch: () => ipcRenderer.invoke('nozich:updates:branch:get'),
+    setBranch: name => ipcRenderer.invoke('nozich:updates:branch:set', name),
     onProgress: callback => {
       const listener = (_event, payload) => callback(payload)
-      ipcRenderer.on('hermes:updates:progress', listener)
-      return () => ipcRenderer.removeListener('hermes:updates:progress', listener)
+      ipcRenderer.on('nozich:updates:progress', listener)
+      return () => ipcRenderer.removeListener('nozich:updates:progress', listener)
     }
   },
   themes: {
-    fetchMarketplace: id => ipcRenderer.invoke('hermes:vscode-theme:fetch', id),
-    searchMarketplace: query => ipcRenderer.invoke('hermes:vscode-theme:search', query)
+    fetchMarketplace: id => ipcRenderer.invoke('nozich:vscode-theme:fetch', id),
+    searchMarketplace: query => ipcRenderer.invoke('nozich:vscode-theme:search', query)
   }
 })

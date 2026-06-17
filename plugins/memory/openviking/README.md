@@ -11,13 +11,13 @@ Context database by Volcengine (ByteDance) with filesystem-style knowledge hiera
 ## Setup
 
 ```bash
-hermes memory setup    # select "openviking"
+nozich memory setup    # select "openviking"
 ```
 
 Or manually:
 ```bash
-hermes config set memory.provider openviking
-echo "OPENVIKING_ENDPOINT=http://localhost:1933" >> ~/.hermes/.env
+nozich config set memory.provider openviking
+echo "OPENVIKING_ENDPOINT=http://localhost:1933" >> ~/.nozich/.env
 ```
 
 ## Config

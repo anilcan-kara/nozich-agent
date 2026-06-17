@@ -1,29 +1,29 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import type { HermesReadDirResult } from '@/global'
+import type { NozichReadDirResult } from '@/global'
 import { $connection, setCurrentCwd } from '@/store/session'
 
 import { resetProjectTreeState } from './files/use-project-tree'
 
 import { RightSidebarPane } from './index'
 
-const readDir = vi.fn<(path: string) => Promise<HermesReadDirResult>>()
+const readDir = vi.fn<(path: string) => Promise<NozichReadDirResult>>()
 const selectPaths = vi.fn()
 
-function ok(entries: { name: string; path: string; isDirectory: boolean }[]): HermesReadDirResult {
+function ok(entries: { name: string; path: string; isDirectory: boolean }[]): NozichReadDirResult {
   return { entries }
 }
 
 function installBridge() {
   ;(
     window as unknown as {
-      hermesDesktop: {
+      nozichDesktop: {
         readDir: typeof readDir
         selectPaths: typeof selectPaths
       }
     }
-  ).hermesDesktop = { readDir, selectPaths }
+  ).nozichDesktop = { readDir, selectPaths }
 }
 
 describe('RightSidebarPane', () => {
@@ -43,7 +43,7 @@ describe('RightSidebarPane', () => {
     $connection.set(null)
     setCurrentCwd('')
     resetProjectTreeState()
-    delete (window as unknown as { hermesDesktop?: unknown }).hermesDesktop
+    delete (window as unknown as { nozichDesktop?: unknown }).nozichDesktop
   })
 
   it('refreshes the current tree without opening the folder picker', async () => {

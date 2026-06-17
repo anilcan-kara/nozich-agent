@@ -1,12 +1,12 @@
 ---
 sidebar_position: 8
 title: "Extending the CLI"
-description: "Build wrapper CLIs that extend the Hermes TUI with custom widgets, keybindings, and layout changes"
+description: "Build wrapper CLIs that extend the Nozich TUI with custom widgets, keybindings, and layout changes"
 ---
 
 # Extending the CLI
 
-Hermes exposes protected extension hooks on `HermesCLI` so wrapper CLIs can add widgets, keybindings, and layout customizations without overriding the 1000+ line `run()` method. This keeps your extension decoupled from internal changes.
+Nozich exposes protected extension hooks on `NozichCLI` so wrapper CLIs can add widgets, keybindings, and layout customizations without overriding the 1000+ line `run()` method. This keeps your extension decoupled from internal changes.
 
 ## Extension points
 
@@ -26,14 +26,14 @@ The first three are new protected hooks. The last two already existed.
 
 ```python
 #!/usr/bin/env python3
-"""my_cli.py — Example wrapper CLI that extends Hermes."""
+"""my_cli.py — Example wrapper CLI that extends Nozich."""
 
-from cli import HermesCLI
+from cli import NozichCLI
 from prompt_toolkit.layout import FormattedTextControl, Window
 from prompt_toolkit.filters import Condition
 
 
-class MyCLI(HermesCLI):
+class MyCLI(NozichCLI):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -76,7 +76,7 @@ if __name__ == "__main__":
 Run it:
 
 ```bash
-cd ~/.hermes/hermes-agent
+cd ~/.nozich/nozich-agent
 source .venv/bin/activate
 python my_cli.py
 ```
@@ -109,7 +109,7 @@ def _get_extra_tui_widgets(self):
 
 ### `_register_extra_tui_keybindings(kb, *, input_area)`
 
-Called after Hermes registers its own keybindings and before the layout is built. Add your keybindings to `kb`.
+Called after Nozich registers its own keybindings and before the layout is built. Add your keybindings to `kb`.
 
 ```python
 def _register_extra_tui_keybindings(self, kb, *, input_area):

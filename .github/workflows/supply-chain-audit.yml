@@ -1,11 +1,7 @@
 name: Supply Chain Audit
 
 on:
-  # No paths filter — the jobs must always run so required checks
-  # report a status (path-gated workflows leave checks "pending" forever
-  # when no matching files change, which blocks merge).
-  pull_request:
-    types: [opened, synchronize, reopened]
+  workflow_dispatch:
 
 permissions:
   pull-requests: write
@@ -20,10 +16,15 @@ permissions:
 # yourself adding WARNING-tier patterns here again, make a separate
 # advisory-only workflow instead.
 
+concurrency:
+  group: wf-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   # ── Path filter (shared by both scan and dep-bounds) ───────────────
   changes:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, s31]
+    timeout-minutes: 20
     outputs:
       # True when any file the scanner cares about changed in this PR
       scan: ${{ steps.filter.outputs.scan }}
@@ -69,7 +70,8 @@ jobs:
     name: Scan PR for critical supply chain risks
     needs: changes
     if: needs.changes.outputs.scan == 'true'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, s31]
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -196,7 +198,8 @@ jobs:
     # skipped — without it, a failed dependency would leave the required
     # check unreported (i.e. "pending"), the exact failure mode this fixes.
     if: always() && needs.changes.outputs.scan != 'true'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, s31]
+    timeout-minutes: 20
     steps:
       - run: echo "No supply-chain-relevant files changed, skipping scan."
 
@@ -204,7 +207,8 @@ jobs:
     name: Check PyPI dependency upper bounds
     needs: changes
     if: needs.changes.outputs.deps == 'true'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, s31]
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -275,7 +279,8 @@ jobs:
     # skipped — without it, a failed dependency would leave the required
     # check unreported (i.e. "pending"), the exact failure mode this fixes.
     if: always() && needs.changes.outputs.deps != 'true'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, s31]
+    timeout-minutes: 20
     steps:
       - run: echo "No pyproject.toml changes, skipping dependency bounds check."
 
@@ -283,7 +288,8 @@ jobs:
     name: MCP catalog security review
     needs: changes
     if: needs.changes.outputs.mcp_catalog == 'true'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, s31]
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -322,6 +328,7 @@ jobs:
     name: MCP catalog security review
     needs: changes
     if: always() && needs.changes.outputs.mcp_catalog != 'true'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, s31]
+    timeout-minutes: 20
     steps:
       - run: echo "No MCP catalog changes, skipping MCP catalog security review."

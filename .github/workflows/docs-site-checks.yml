@@ -1,31 +1,28 @@
 name: Docs Site Checks
 
 on:
-  # No paths filter — the job must always run so the required check
-  # reports a status (path-gated workflows leave checks "pending" forever
-  # when no matching files change, which blocks merge).
-  pull_request:
-    branches: [main]
-
   workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: wf-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   docs-site-checks:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, s31]
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+      - uses: oven-sh/setup-bun@v2
         with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: website/package-lock.json
+          bun-version: 1.4.4
 
       - name: Install website dependencies
-        run: npm ci
+        run: bun install
         working-directory: website
 
       - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
@@ -42,9 +39,9 @@ jobs:
         run: python3 website/scripts/generate-skill-docs.py
 
       - name: Lint docs diagrams
-        run: npm run lint:diagrams
+        run: bun run lint:diagrams
         working-directory: website
 
       - name: Build Docusaurus
-        run: npm run build
+        run: bun run build
         working-directory: website

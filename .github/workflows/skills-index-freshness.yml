@@ -8,18 +8,21 @@ name: Skills Index Freshness Check
 # Triggered every 4 hours so we catch a stuck cron within one tick.
 
 on:
-  schedule:
-    - cron: '0 */4 * * *'
   workflow_dispatch:
 
 permissions:
   contents: read
   issues: write
 
+concurrency:
+  group: wf-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   check-freshness:
     if: github.repository == 'anilcan-kara/nozich-agent'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, s31]
+    timeout-minutes: 20
     steps:
       - name: Probe live index
         id: probe

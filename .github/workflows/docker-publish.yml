@@ -1,25 +1,7 @@
 name: Docker Build and Publish
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - '**/*.py'
-      - 'pyproject.toml'
-      - 'uv.lock'
-      - 'Dockerfile'
-      - 'docker/**'
-      - '.github/workflows/docker-publish.yml'
-      - '.github/actions/nozich-smoke-test/**'
-
-  # No paths filter — the job must always run so the required check
-  # reports a status (path-gated workflows leave checks "pending" forever
-  # when no matching files change, which blocks merge).
-  pull_request:
-    branches: [main]
-
-  release:
-    types: [published]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -48,7 +30,7 @@ jobs:
   build-amd64:
     # Only run on the upstream repository, not on forks
     if: github.repository == 'anilcan-kara/nozich-agent'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, s31]
     timeout-minutes: 45
     outputs:
       digest: ${{ steps.push.outputs.digest }}
@@ -182,7 +164,7 @@ jobs:
   # ---------------------------------------------------------------------------
   build-arm64:
     if: github.repository == 'anilcan-kara/nozich-agent'
-    runs-on: ubuntu-24.04-arm
+    runs-on: [self-hosted, s31]
     timeout-minutes: 45
     outputs:
       digest: ${{ steps.push.outputs.digest }}
@@ -304,7 +286,8 @@ jobs:
   # ---------------------------------------------------------------------------
   merge:
     if: github.repository == 'anilcan-kara/nozich-agent' && (github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'release')
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, s31]
+    timeout-minutes: 20
     needs: [build-amd64, build-arm64]
     timeout-minutes: 10
     steps:

@@ -6,13 +6,17 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: wf-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   # Gate: workflow_dispatch is already restricted to users with write access,
   # but we want ADMIN-only. Explicitly check the triggering actor's repo
   # permission via the API and fail fast for anyone below admin.
   authorize:
     name: Authorize (admins only)
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, s31]
     timeout-minutes: 5
     steps:
       - name: Check actor is a repo admin
@@ -34,7 +38,7 @@ jobs:
   build:
     name: Nozich-Setup.exe
     needs: authorize
-    runs-on: windows-latest
+    runs-on: [self-hosted, s31]
     timeout-minutes: 30
     permissions:
       contents: read
@@ -46,13 +50,12 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
 
       - name: Setup Node.js
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020  # v4
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: 22
-          cache: npm
+          bun-version: 1.4.4
 
       - name: Install npm dependencies
-        run: npm ci
+        run: bun install
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8  # stable
@@ -63,7 +66,7 @@ jobs:
           workspaces: apps/bootstrap-installer/src-tauri
 
       - name: Build installer
-        run: npm run tauri:build
+        run: bun run tauri:build
         working-directory: apps/bootstrap-installer
 
       - name: Azure login (OIDC)

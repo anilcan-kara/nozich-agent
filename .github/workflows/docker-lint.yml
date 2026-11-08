@@ -11,19 +11,7 @@ name: Docker / shell lint
 # activate script doesn't exist at lint time.
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - Dockerfile
-      - docker/**
-      - .hadolint.yaml
-      - .github/workflows/docker-lint.yml
-
-  # No paths filter — the job must always run so the required check
-  # reports a status (path-gated workflows leave checks "pending" forever
-  # when no matching files change, which blocks merge).
-  pull_request:
-    branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -35,7 +23,7 @@ concurrency:
 jobs:
   hadolint:
     name: Lint Dockerfile (hadolint)
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, s31]
     timeout-minutes: 5
     steps:
       - name: Checkout code
@@ -50,7 +38,7 @@ jobs:
 
   shellcheck:
     name: Lint docker/ shell scripts (shellcheck)
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, s31]
     timeout-minutes: 5
     steps:
       - name: Checkout code

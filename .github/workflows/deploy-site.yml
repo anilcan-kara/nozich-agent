@@ -1,26 +1,7 @@
 name: Deploy Site
 
 on:
-  release:
-    types: [published]
-  push:
-    branches: [main]
-    paths:
-      - 'website/**'
-      - 'skills/**'
-      - 'optional-skills/**'
-      - '.github/workflows/deploy-site.yml'
   workflow_dispatch:
-    inputs:
-      skills_index_run_id:
-        description: 'Optional Build Skills Index run ID whose skills-index artifact should be deployed'
-        required: false
-        type: string
-      rebuild_skills_index:
-        description: 'Force a fresh multi-source crawl instead of reusing the latest healthy index'
-        required: false
-        default: false
-        type: boolean
 
 permissions:
   contents: read
@@ -40,25 +21,25 @@ jobs:
     # a skills-index PR that doesn't touch website/** paths and so
     # doesn't auto-deploy via the deploy-docs path.
     if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, s31]
+    timeout-minutes: 20
     steps:
       - name: Trigger Vercel Deploy
         run: curl -X POST "${{ secrets.VERCEL_DEPLOY_HOOK }}"
 
   deploy-docs:
     if: github.repository == 'anilcan-kara/nozich-agent'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, s31]
+    timeout-minutes: 20
     environment:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
 
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020  # v4
+      - uses: oven-sh/setup-bun@v2
         with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: website/package-lock.json
+          bun-version: 1.4.4
 
       - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # v6.2.0
         with:
@@ -150,11 +131,11 @@ jobs:
         run: python3 website/scripts/generate-skill-docs.py
 
       - name: Install dependencies
-        run: npm ci
+        run: bun install
         working-directory: website
 
       - name: Build Docusaurus
-        run: npm run build
+        run: bun run build
         working-directory: website
 
       - name: Stage deployment

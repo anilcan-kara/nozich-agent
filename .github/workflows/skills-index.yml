@@ -1,25 +1,22 @@
 name: Build Skills Index
 
 on:
-  schedule:
-    # Run twice daily: 6 AM and 6 PM UTC
-    - cron: '0 6,18 * * *'
-  workflow_dispatch:  # Manual trigger
-  push:
-    branches: [main]
-    paths:
-      - 'scripts/build_skills_index.py'
-      - '.github/workflows/skills-index.yml'
+  workflow_dispatch:
 
 permissions:
   contents: read
   actions: write   # to trigger deploy-site.yml on schedule
 
+concurrency:
+  group: wf-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-index:
     # Only run on the upstream repository, not on forks
     if: github.repository == 'anilcan-kara/nozich-agent'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, s31]
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
 
@@ -48,7 +45,8 @@ jobs:
   trigger-deploy:
     needs: build-index
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, s31]
+    timeout-minutes: 20
     steps:
       - name: Trigger Deploy Site workflow
         env:
